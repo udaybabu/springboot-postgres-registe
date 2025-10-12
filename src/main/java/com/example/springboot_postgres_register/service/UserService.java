@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.example.springboot_postgres_register.model.User;
 import com.example.springboot_postgres_register.repository.UserRepository;
-import com.example.springboot_postgres_register.util.Util;
+import com.example.springboot_postgres_register.util.JwtUtil;
 import  java.util.*;
 import java.util.List;
 import java.util.Optional;
@@ -26,7 +26,7 @@ public class UserService {
         Map<String, Object> response = new HashMap<>();
 
         if (user.isPresent()) {
-            String token = Util.generateToken(email); // 10 min expiry handled in Util
+            String token = JwtUtil.generateToken(email); // 10 min expiry handled in Util
             response.put("status", "success");
             response.put("message", "Login successful!");
             response.put("cookie", token);

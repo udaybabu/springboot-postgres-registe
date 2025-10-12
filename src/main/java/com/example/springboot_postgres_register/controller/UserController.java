@@ -9,7 +9,7 @@ import  com.example.springboot_postgres_register.service.UserService;
 import java.util.*;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
-import com.example.springboot_postgres_register.util.Util;
+import com.example.springboot_postgres_register.util.JwtUtil;
 
 import java.util.List;
 import java.util.Optional;
