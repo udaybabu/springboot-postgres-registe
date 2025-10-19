@@ -1,13 +1,14 @@
 package com.example.springboot_postgres_register.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.example.springboot_postgres_register.model.User;
 import com.example.springboot_postgres_register.repository.UserRepository;
 import com.example.springboot_postgres_register.util.JwtUtil;
-import  java.util.*;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -20,16 +21,17 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    // LOGIN (returns token if successful)
+    // LOGIN
     public Map<String, Object> loginUser(String email, String password) {
         Optional<User> user = userRepository.findByEmailAndPassword(email, password);
         Map<String, Object> response = new HashMap<>();
 
         if (user.isPresent()) {
-            String token = JwtUtil.generateToken(email); // 10 min expiry handled in Util
+            String token = JwtUtil.generateToken(email);
             response.put("status", "success");
             response.put("message", "Login successful!");
-            response.put("cookie", token);
+            response.put("token", token);
+            response.put("data", user);
         } else {
             response.put("status", "error");
             response.put("message", "Invalid email or password!");
@@ -38,9 +40,18 @@ public class UserService {
         return response;
     }
 
-    // READ (All Users)
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    // ✅ READ (Paginated Users)
+    public Map<String, Object> getAllUsers(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<User> userPage = userRepository.findAll(pageable);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("users", userPage.getContent());
+        response.put("currentPage", userPage.getNumber());
+        response.put("totalItems", userPage.getTotalElements());
+        response.put("totalPages", userPage.getTotalPages());
+
+        return response;
     }
 
     // READ (Single User)

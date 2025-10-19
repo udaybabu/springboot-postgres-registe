@@ -6,6 +6,8 @@ import io.jsonwebtoken.security.Keys;
 
 import java.security.Key;
 import java.util.Date;
+import io.jsonwebtoken.*;
+
 
 public class JwtUtil {
     // Secret key for signing (you can move it to application.properties)
@@ -23,17 +25,21 @@ public class JwtUtil {
                 .compact();
     }
 
-    // Validate token
-    public static String validateToken(String token) {
+    public static boolean validateToken(String token) {
         try {
-            return Jwts.parserBuilder()
-                    .setSigningKey(SECRET_KEY)
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody()
-                    .getSubject();
-        } catch (Exception e) {
-            return null;
+            Jwts.parserBuilder().setSigningKey(SECRET_KEY).build().parseClaimsJws(token);
+            return true;
+        } catch (JwtException e) {
+            return false;
         }
+    }
+
+    public static String getEmailFromToken(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(SECRET_KEY)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
     }
 }

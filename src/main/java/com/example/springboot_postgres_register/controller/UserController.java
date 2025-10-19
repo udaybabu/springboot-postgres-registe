@@ -1,31 +1,28 @@
 package com.example.springboot_postgres_register.controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import  com.example.springboot_postgres_register.model.User;
-import  com.example.springboot_postgres_register.service.UserService;
-import java.util.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import com.example.springboot_postgres_register.model.User;
+import com.example.springboot_postgres_register.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
-import com.example.springboot_postgres_register.util.JwtUtil;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/v1/api/users")
 public class UserController {
+
     @Autowired
     private UserService userService;
 
-    // CREATE
+    // ✅ CREATE USER
     @PostMapping
     public User createUser(@RequestBody User user) {
         return userService.createUser(user);
     }
-    // LOGIN (sets  in cookie)
+
+    // ✅ LOGIN (sets token in cookie)
     @PostMapping("/login")
     public Map<String, Object> loginUser(@RequestBody Map<String, String> loginData,
                                          HttpServletResponse response) {
@@ -36,38 +33,41 @@ public class UserController {
         if ("success".equals(result.get("status"))) {
             String token = (String) result.get("token");
 
-            // Create cookie for  token
-            Cookie cookie = new Cookie("cookie", token);
-            cookie.setHttpOnly(true); // Prevent JavaScript access (secure)
-            cookie.setSecure(false);  // Set true if using HTTPS
+            Cookie cookie = new Cookie("token", token);
+            cookie.setHttpOnly(true);
+            cookie.setSecure(true);  // set to true if HTTPS
             cookie.setPath("/");
-            cookie.setMaxAge(10 * 60); // 10 minutes in seconds
+            cookie.setMaxAge(10 * 60); // 10 minutes
 
-            // Add cookie to response
             response.addCookie(cookie);
         }
+        result.remove("token");
 
         return result;
     }
-    // READ ALL
+
+    // ✅ READ ALL USERS (with pagination)
     @GetMapping
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
+    public Map<String, Object> getAllUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "30") int size) {
+
+        return userService.getAllUsers(page, size);
     }
 
-    // READ BY ID
+    // ✅ READ SINGLE USER BY ID
     @GetMapping("/{id}")
     public Optional<User> getUserById(@PathVariable Long id) {
         return userService.getUserById(id);
     }
 
-    // UPDATE
+    // ✅ UPDATE USER
     @PutMapping("/{id}")
     public User updateUser(@PathVariable Long id, @RequestBody User user) {
         return userService.updateUser(id, user);
     }
 
-    // DELETE
+    // ✅ DELETE USER
     @DeleteMapping("/{id}")
     public String deleteUser(@PathVariable Long id) {
         return userService.deleteUser(id);
