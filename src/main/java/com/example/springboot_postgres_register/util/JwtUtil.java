@@ -1,16 +1,11 @@
 package com.example.springboot_postgres_register.util;
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-
 import java.security.Key;
 import java.util.Date;
-import io.jsonwebtoken.*;
-
 
 public class JwtUtil {
-    // Secret key for signing (you can move it to application.properties)
     private static final Key SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
     // Generate JWT with 10 minutes expiration
@@ -25,21 +20,18 @@ public class JwtUtil {
                 .compact();
     }
 
-    public static boolean validateToken(String token) {
-        try {
-            Jwts.parserBuilder().setSigningKey(SECRET_KEY).build().parseClaimsJws(token);
-            return true;
-        } catch (JwtException e) {
-            return false;
-        }
-    }
-
+    // ✅ Combined method — safely validates & returns email, or null if invalid
     public static String getEmailFromToken(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(SECRET_KEY)
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(SECRET_KEY)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getSubject();
+        } catch (JwtException e) {
+            // Token is expired, invalid, or malformed
+            return null;
+        }
     }
 }

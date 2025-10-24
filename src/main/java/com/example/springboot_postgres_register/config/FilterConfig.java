@@ -9,10 +9,10 @@ import org.springframework.context.annotation.Configuration;
 public class FilterConfig {
 
     @Bean
-    public FilterRegistrationBean<JwtHeaderAuthFilter> jwtHeaderFilter() {
+    public FilterRegistrationBean<JwtHeaderAuthFilter> jwtCookieFilter() {
         FilterRegistrationBean<JwtHeaderAuthFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(new JwtHeaderAuthFilter());
-        registrationBean.addUrlPatterns("/v1/api/users/*"); // applies to all secured routes
+        registrationBean.addUrlPatterns("/v1/api/users/*"); // apply to all secured routes
         registrationBean.setOrder(1);
         return registrationBean;
     }

@@ -31,7 +31,7 @@ public class UserService {
             response.put("status", "success");
             response.put("message", "Login successful!");
             response.put("token", token);
-            response.put("data", user);
+            response.put("user", user);
         } else {
             response.put("status", "error");
             response.put("message", "Invalid email or password!");
